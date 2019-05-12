@@ -576,7 +576,20 @@ public class World
 		return availableMoves;
 	}
 
-	public void setAvailableMoves(ArrayList<String> availableMoves) {
-		this.availableMoves = availableMoves;
+	public String[][] getBoard() {
+		return board;
 	}
+
+	public int getMyColor() {
+		return myColor;
+	}
+
+	public int getRows() {
+		return rows;
+	}
+
+	public int getColumns() {
+		return columns;
+	}
+
 }

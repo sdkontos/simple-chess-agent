@@ -28,6 +28,54 @@ public class Minimax {
 
     }
 
+    private int evaluateWorld(World world){
+        String[][] board = world.getBoard();
+        int totalEvaluation = 0;
+        for(int i=0; i<world.getRows(); i++){
+            for(int j=0; j<world.getColumns(); j++){
+                totalEvaluation += getCellValue(world.getBoard()[i][j]);
+            }
+        }
+        return totalEvaluation;
+    }
+
+    private int getCellValue(String piece){
+        String color = Character.toString(piece.charAt(0));
+        int colorINT;
+        String chessPart = Character.toString(piece.charAt(1));
+
+        if(chessPart.equals(" ")){      // empty cell
+            return 0;
+        }
+
+        int absoluteValue;
+
+        if(chessPart.equals("P")){      // pawn
+            absoluteValue = 1;
+        }
+        else if(chessPart.equals("R")){ // rook
+            absoluteValue = 3;
+        }
+        else{                           // king
+            absoluteValue = 9;
+        }
+
+        if(color.equals("W")){
+            colorINT = 0;
+        }
+        else{
+            colorINT = 1;
+        }
+
+        if(colorINT == world.getMyColor()){
+            return absoluteValue;
+        }
+        else{
+            return -absoluteValue;
+        }
+
+    }
+
 
 
     public int getDepth() {
