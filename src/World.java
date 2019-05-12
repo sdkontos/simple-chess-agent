@@ -545,16 +545,22 @@ public class World
 		return nBranches / (double) nTurns;
 	}
 	
-	public void makeMove(int x1, int y1, int x2, int y2, int prizeX, int prizeY)
+	public String[] makeMove(int x1, int y1, int x2, int y2, int prizeX, int prizeY)
 	{
-		String chesspart = Character.toString(board[x1][y1].charAt(1));
+		String chessPart = Character.toString(board[x1][y1].charAt(1));
 		
 		boolean pawnLastRow = false;
+		String oldValue = "";
+		String newValue = "";
+
+		String[] undoInfo = new String[2];
 		
 		// check if it is a move that has made a move to the last line
-		if(chesspart.equals("P"))
+		if(chessPart.equals("P"))
 			if( (x1==rows-2 && x2==rows-1) || (x1==1 && x2==0) )
 			{
+				oldValue = board[x2][y2];
+				newValue = board[x1][y1];
 				board[x2][y2] = " ";	// in a case an opponent's chess part has just been captured
 				board[x1][y1] = " ";
 				pawnLastRow = true;
@@ -563,13 +569,26 @@ public class World
 		// otherwise
 		if(!pawnLastRow)
 		{
+			oldValue = board[x2][y2];
+			newValue = board[x1][y1];
 			board[x2][y2] = board[x1][y1];
 			board[x1][y1] = " ";
 		}
 		
 		// check if a prize has been added in the game
-		if(prizeX != noPrize)
+		if(prizeX != noPrize){
 			board[prizeX][prizeY] = "P";
+		}
+
+		undoInfo[0] = oldValue;
+		undoInfo[1] = newValue;
+
+		return undoInfo;
+	}
+
+	public void undoMove(int x1, int y1, int x2, int y2, String[] undoInfo){
+		board[x1][y1] = undoInfo[0];
+		board[x2][y2] = undoInfo[1];
 	}
 
 	public ArrayList<String> getAvailableMoves() {
