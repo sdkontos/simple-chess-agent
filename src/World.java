@@ -13,7 +13,8 @@ public class World
 	private int nTurns = 0;
 	private int nBranches = 0;
 	private int noPrize = 9;
-	
+	private String minimaxBestMove;
+
 	public World()
 	{
 		board = new String[rows][columns];
@@ -71,6 +72,11 @@ public class World
 			board[rows/2][j] = "P";
 		
 		availableMoves = new ArrayList<String>();
+	}
+
+	public void applyMinimax(boolean forMySelf){
+		Minimax minimax = new Minimax(forMySelf,this);
+		this.minimaxBestMove = minimax.applyMinimaxRoot();
 	}
 	
 	public void setMyColor(int myColor)
@@ -547,6 +553,7 @@ public class World
 	
 	public String[] makeMove(int x1, int y1, int x2, int y2, int prizeX, int prizeY)
 	{
+		System.out.println(board[x1][y1]);
 		String chessPart = Character.toString(board[x1][y1].charAt(1));
 		
 		boolean pawnLastRow = false;

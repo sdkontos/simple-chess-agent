@@ -56,6 +56,7 @@ public class Minimax {
             int bestMoveVal = -INFINITY;
             for(int i=0; i<availableMoves.size(); i++){
                 String newMove = availableMoves.get(i);
+                System.out.println('\n' + newMove);
                 String[] undoInfo = world.makeMove(Character.getNumericValue(newMove.charAt(0)),Character.getNumericValue(newMove.charAt(1)),Character.getNumericValue(newMove.charAt(2)),Character.getNumericValue(newMove.charAt(3)),9,9);
                 this.bestMoveValue = Math.min(bestMoveVal,minimax(depth-1, false));
                 world.undoMove(Character.getNumericValue(newMove.charAt(0)),Character.getNumericValue(newMove.charAt(1)),Character.getNumericValue(newMove.charAt(2)),Character.getNumericValue(newMove.charAt(3)),undoInfo);

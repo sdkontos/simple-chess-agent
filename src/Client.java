@@ -200,6 +200,8 @@ public class Client
 					
 					if(nextPlayer==myColor)
 					{
+						world.applyMinimax(true);
+
 						String action = world.selectAction();
 						
 						try
@@ -221,6 +223,7 @@ public class Client
 					}
 					else
 					{
+						world.applyMinimax(false);
 						continue;
 					}				
 				}
