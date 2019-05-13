@@ -530,7 +530,7 @@ public class World
 							move = Integer.toString(i) + Integer.toString(j) + 
 								   Integer.toString(i) + Integer.toString(j+1);
 								
-							availableMoves.add(move);	
+							availableMoves.add(move);
 						}
 					}
 				}			

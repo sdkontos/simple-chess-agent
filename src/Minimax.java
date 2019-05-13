@@ -1,3 +1,4 @@
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import java.lang.*;
 import java.util.ArrayList;
@@ -5,12 +6,13 @@ import java.util.ArrayList;
 public class Minimax {
 
     private final int INFINITY = 100000;
-    private int depth = 3;
+    private int depth;
     private boolean myTurn;
     private World world;
     private String bestMove;
     private int bestMoveValue;
 
+    @Contract(pure = true)
     public Minimax(boolean myTurn, World world) {
         this.depth = 3;
         this.myTurn = myTurn;
@@ -44,29 +46,26 @@ public class Minimax {
 
         if(myTurn){
             int bestMoveVal = -INFINITY;
-            for(int i=0; i<availableMoves.size(); i++){
-                String newMove = availableMoves.get(i);
-                String[] undoInfo = world.makeMove(Character.getNumericValue(newMove.charAt(0)),Character.getNumericValue(newMove.charAt(1)),Character.getNumericValue(newMove.charAt(2)),Character.getNumericValue(newMove.charAt(3)),9,9);
-                this.bestMoveValue = Math.max(bestMoveVal,minimax(depth-1, true));
-                world.undoMove(Character.getNumericValue(newMove.charAt(0)),Character.getNumericValue(newMove.charAt(1)),Character.getNumericValue(newMove.charAt(2)),Character.getNumericValue(newMove.charAt(3)),undoInfo);
+            for (String newMove : availableMoves) {
+                String[] undoInfo = world.makeMove(Character.getNumericValue(newMove.charAt(0)), Character.getNumericValue(newMove.charAt(1)), Character.getNumericValue(newMove.charAt(2)), Character.getNumericValue(newMove.charAt(3)), 9, 9);
+                this.bestMoveValue = Math.max(bestMoveVal, minimax(depth - 1, true));
+                world.undoMove(Character.getNumericValue(newMove.charAt(0)), Character.getNumericValue(newMove.charAt(1)), Character.getNumericValue(newMove.charAt(2)), Character.getNumericValue(newMove.charAt(3)), undoInfo);
             }
             return bestMoveValue;
         }
         else{
             int bestMoveVal = -INFINITY;
-            for(int i=0; i<availableMoves.size(); i++){
-                String newMove = availableMoves.get(i);
+            for (String newMove : availableMoves) {
                 System.out.println('\n' + newMove);
-                String[] undoInfo = world.makeMove(Character.getNumericValue(newMove.charAt(0)),Character.getNumericValue(newMove.charAt(1)),Character.getNumericValue(newMove.charAt(2)),Character.getNumericValue(newMove.charAt(3)),9,9);
-                this.bestMoveValue = Math.min(bestMoveVal,minimax(depth-1, false));
-                world.undoMove(Character.getNumericValue(newMove.charAt(0)),Character.getNumericValue(newMove.charAt(1)),Character.getNumericValue(newMove.charAt(2)),Character.getNumericValue(newMove.charAt(3)),undoInfo);
+                String[] undoInfo = world.makeMove(Character.getNumericValue(newMove.charAt(0)), Character.getNumericValue(newMove.charAt(1)), Character.getNumericValue(newMove.charAt(2)), Character.getNumericValue(newMove.charAt(3)), 9, 9);
+                this.bestMoveValue = Math.min(bestMoveVal, minimax(depth - 1, false));
+                world.undoMove(Character.getNumericValue(newMove.charAt(0)), Character.getNumericValue(newMove.charAt(1)), Character.getNumericValue(newMove.charAt(2)), Character.getNumericValue(newMove.charAt(3)), undoInfo);
             }
             return bestMoveValue;
         }
     }
 
     private int evaluateWorld(@NotNull World world){
-        String[][] board = world.getBoard();
         int totalEvaluation = 0;
         for(int i=0; i<world.getRows(); i++){
             for(int j=0; j<world.getColumns(); j++){
@@ -87,16 +86,16 @@ public class Minimax {
 
         int absoluteValue;
 
-        if(secondLetter.equals("P"))      // pawn
+        if(secondLetter.equals("P"))        // pawn
             absoluteValue = 1;
         
-        else if(secondLetter.equals("R")) // rook
+        else if(secondLetter.equals("R"))   // rook
             absoluteValue = 3;
         
-        else                           // king
+        else                                // king
             absoluteValue = 9;
         
-        if(firstLetter.equals("P"))          // prize
+        if(firstLetter.equals("P"))         // prize
             absoluteValue = 1;
         
 
