@@ -6,8 +6,9 @@ import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.Random;
 
-public class Client
-{
+public class Client{
+	private static final int WHITE = 0;
+	private static final int BLACK = 1;
 	private static final int PORTServer = 9876;
 	private DatagramSocket clientSocket = null;
 	private byte[] sendData = null;
@@ -26,11 +27,9 @@ public class Client
 	private int scoreBlack = 0;
 	private int delay = 10;		// never set it to 0
 	
-	public Client()
-	{
+	public Client(){
 		// initialization of the fields
-		try
-		{
+		try{
 			clientSocket = new DatagramSocket();
 			
 			sendData = new byte[size];
@@ -41,8 +40,7 @@ public class Client
 			receivePacket = new DatagramPacket(receiveData, receiveData.length);
 			sendPacket = new DatagramPacket(sendData, sendData.length, host, PORTServer);
 		}
-		catch(SocketException | UnknownHostException e)
-		{
+		catch(SocketException | UnknownHostException e){
 			// print the occurred exception
 			System.out.println(e.getClass().getName() + " : " + e.getMessage());
 		}
@@ -56,33 +54,27 @@ public class Client
 		world = new World();
 	}
 	
-	private void sendName()
-	{
+	private void sendName(){
 		// add your name here, remove comment below
 		myName = "minimax";
 		
-		try
-		{
+		try{
 			// turn my name into bytes
 			sendData = myName.getBytes("UTF-8");
 			sendPacket.setData(sendData);
 			sendPacket.setLength(sendData.length);
 			clientSocket.send(sendPacket);
 		}
-		catch(IOException e)
-		{
+		catch(IOException e){
 			// print the occurred exception
 			System.out.println(e.getClass().getName() + " : " + e.getMessage());
 		}
 	}
 	
-	private void receiveMessages()
-	{
+	private void receiveMessages(){
 		// keep on receiving messages and act according to their content
-		while(true)
-		{
-			try
-			{
+		while(true){
+			try{
 				// waiting for a message from the server
 				clientSocket.receive(receivePacket);
 				
@@ -97,39 +89,36 @@ public class Client
 				// get the first letter of the String
 				String firstLetter = Character.toString(receivedMsg.charAt(0));
 				
-				if(firstLetter.equals("P"))		// received information is about my colour
-				{
+				if(firstLetter.equals("P")){	// received information is about my colour
+
 					// get the second letter of the String
 					String secondLetter = Character.toString(receivedMsg.charAt(1));
 					
 					if(secondLetter.equals("W"))
-						myColor = 0;
+						myColor = WHITE;
 					else
-						myColor = 1;
+						myColor = BLACK;
 					
 					world.setMyColor(myColor);
 				}				
-				else if(firstLetter.equals("G"))	// received information is about the game (begin/end)
-				{
+				else if(firstLetter.equals("G")){	// received information is about the game (begin/end)
+
 					// get the second letter of the String
 					String secondLetter = Character.toString(receivedMsg.charAt(1));
 					
-					if(secondLetter.equals("B"))
-					{
+					if(secondLetter.equals("B")){
+
 						// beginning of the game
-						if(myColor == 0)
-						{
-							String action = world.selectAction();
+						if(myColor == WHITE){
+							String action = world.selectAction(true);
 							
-							try
-							{
+							try{
 								synchronized(this)
 								{
 									this.wait(delay);
 								}
 							}
-							catch(InterruptedException e)
-							{
+							catch(InterruptedException e){
 								System.out.println(e.getClass().getName() + " : " + e.getMessage());
 							}
 							
@@ -141,16 +130,15 @@ public class Client
 						else
 							continue;
 					}
-					else	// secondLetter.equals("E") - the game has ended
-					{
+					else{	// secondLetter.equals("E") - the game has ended
+
 						scoreWhite = Integer.parseInt(Character.toString(receivedMsg.charAt(2))
 								                    + Character.toString(receivedMsg.charAt(3)));
 						
 						scoreBlack = Integer.parseInt(Character.toString(receivedMsg.charAt(4))
 						                            + Character.toString(receivedMsg.charAt(5)));
 						
-						if(scoreWhite - scoreBlack > 0)
-						{
+						if(scoreWhite - scoreBlack > 0){
 							if(myColor == 0)
 								System.out.println("I won! " + scoreWhite + "-" + scoreBlack);
 							else
@@ -158,8 +146,7 @@ public class Client
 							
 							System.out.println("My average branch factor was : " + world.getAvgBFactor());
 						}
-						else if(scoreWhite - scoreBlack < 0)
-						{
+						else if(scoreWhite - scoreBlack < 0){
 							if(myColor == 0)
 								System.out.println("I lost. " + scoreWhite + "-" + scoreBlack);
 							else
@@ -167,8 +154,7 @@ public class Client
 							
 							System.out.println("My average branch factor was : " + world.getAvgBFactor());
 						}
-						else
-						{
+						else{
 							System.out.println("It is a draw! " + scoreWhite + "-" + scoreBlack);
 							
 							System.out.println("My average branch factor was : " + world.getAvgBFactor());
@@ -177,8 +163,8 @@ public class Client
 						break;
 					}
 				}
-				else	// firstLetter.equals("T") - a move has been made
-				{
+				else{	// firstLetter.equals("T") - a move has been made
+
 					// decode the rest of the message
 					int nextPlayer = Integer.parseInt(Character.toString(receivedMsg.charAt(1)));
 					
@@ -198,21 +184,18 @@ public class Client
 					
 					world.makeMove(x1,y1,x2,y2,prizeX,prizeY);
 					
-					if(nextPlayer==myColor)
-					{
-						world.applyMinimax(true);
+					if(nextPlayer==myColor){
 
-						String action = world.selectAction();
+
+						String action = world.selectAction(false);
 						
-						try
-						{
+						try{
 							synchronized(this)
 							{
 								this.wait(delay);
 							}
 						}
-						catch(InterruptedException e)
-						{
+						catch(InterruptedException e){
 							System.out.println(e.getClass().getName() + " : " + e.getMessage());
 						}
 						
@@ -221,16 +204,13 @@ public class Client
 						sendPacket.setLength(sendData.length);
 						clientSocket.send(sendPacket);			
 					}
-					else
-					{
-						world.applyMinimax(false);
+					else{
 						continue;
 					}				
 				}
 				
 			}
-			catch(IOException e)
-			{
+			catch(IOException e){
 				System.out.println(e.getClass().getName() + " : " + e.getMessage());
 			}
 		}
@@ -247,8 +227,7 @@ public class Client
 	}
 	
 	// testing
-	public static void main(String[] args)
-	{
+	public static void main(String[] args){
 		Client client = new Client();
 		
 		// optionally adding delay to response

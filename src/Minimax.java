@@ -1,118 +1,141 @@
-import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.NotNull;
 import java.lang.*;
 import java.util.ArrayList;
 
 public class Minimax {
 
+    private static final int WHITE = 0;
+    private static final int EMPTY = 0;
+    private static final int BLACK = 1;
     private final int INFINITY = 100000;
     private int depth;
-    private boolean myTurn;
-    private World world;
-    private String bestMove;
-    private int bestMoveValue;
+    private int myColor;
+    private int oppColor;
 
-    @Contract(pure = true)
-    public Minimax(boolean myTurn, World world) {
-        this.depth = 3;
-        this.myTurn = myTurn;
-        this.world = world;
+
+    public Minimax(int depth, int myColor) {
+
+        this.depth = depth;
+        this.myColor = myColor;
+
+        if(myColor == WHITE)
+            oppColor = BLACK;
+        else
+            oppColor = WHITE;
     }
 
-    public String applyMinimaxRoot(){
-        ArrayList<String> availableMoves;
-        availableMoves = world.getAvailableMoves();
-        this.bestMoveValue = - INFINITY;
+    public String getMinimaxDecision(World world){
 
+        ArrayList<String> availableMoves = world.getAvailableMoves();
+        ArrayList<String> state = new ArrayList<>();
+
+        float[] costs = new float[availableMoves.size()];
+
+        // get best move
+        for(int i=0; i<availableMoves.size(); i++) {
+            state.add(availableMoves.get(i));
+            float tmpCost = minValue(world,state,2);
+            costs[i] = tmpCost;
+            state.remove(state.lastIndexOf(availableMoves.get(i)));
+        }
+
+        int maxIndex = -1;
+        float max = Float.NEGATIVE_INFINITY;
         for(int i=0; i<availableMoves.size(); i++){
-            String newMove = availableMoves.get(i);
-            String[] undoInfo = world.makeMove(Character.getNumericValue(newMove.charAt(0)),Character.getNumericValue(newMove.charAt(1)),Character.getNumericValue(newMove.charAt(2)),Character.getNumericValue(newMove.charAt(3)),9,9);
-            int value = minimax(depth-1,myTurn);
-            world.undoMove(Character.getNumericValue(newMove.charAt(0)),Character.getNumericValue(newMove.charAt(1)),Character.getNumericValue(newMove.charAt(2)),Character.getNumericValue(newMove.charAt(3)),undoInfo);
-            if(value >= bestMoveValue){
-                bestMoveValue = value;
-                bestMove = newMove;
+            if(costs[i] >= max){
+                max = costs[i];
+                maxIndex = i;
             }
         }
-        return bestMove;
+
+        if(maxIndex == -1)
+            return null;
+        else
+            return availableMoves.get(maxIndex);
     }
 
-    private int minimax(int depth, boolean myTurn){
-        if(depth == 0){
-            return evaluateWorld(world);
-        }
-        ArrayList<String> availableMoves;
-        availableMoves = world.getAvailableMoves();
+    private float minValue(World w, ArrayList<String> state, int depth){
 
-        if(myTurn){
-            int bestMoveVal = -INFINITY;
-            for (String newMove : availableMoves) {
-                String[] undoInfo = world.makeMove(Character.getNumericValue(newMove.charAt(0)), Character.getNumericValue(newMove.charAt(1)), Character.getNumericValue(newMove.charAt(2)), Character.getNumericValue(newMove.charAt(3)), 9, 9);
-                this.bestMoveValue = Math.max(bestMoveVal, minimax(depth - 1, true));
-                world.undoMove(Character.getNumericValue(newMove.charAt(0)), Character.getNumericValue(newMove.charAt(1)), Character.getNumericValue(newMove.charAt(2)), Character.getNumericValue(newMove.charAt(3)), undoInfo);
-            }
-            return bestMoveValue;
+        if(depth >= this.depth)
+            return evaluateWorld(w,oppColor);
+
+        float min = Float.POSITIVE_INFINITY;
+        ArrayList<String> moves = w.getAvailableMovesAfterMove(state,oppColor);
+        if(moves.size() == EMPTY)
+            return Float.POSITIVE_INFINITY;
+
+        for(int i=0; i<moves.size(); i++){
+            state.add(moves.get(i));
+            float tmp = maxValue(w, state, depth+1);
+            if(tmp < min)
+                min = tmp;
+            state.remove(state.lastIndexOf(moves.get(i)));
         }
-        else{
-            int bestMoveVal = -INFINITY;
-            for (String newMove : availableMoves) {
-                System.out.println('\n' + newMove);
-                String[] undoInfo = world.makeMove(Character.getNumericValue(newMove.charAt(0)), Character.getNumericValue(newMove.charAt(1)), Character.getNumericValue(newMove.charAt(2)), Character.getNumericValue(newMove.charAt(3)), 9, 9);
-                this.bestMoveValue = Math.min(bestMoveVal, minimax(depth - 1, false));
-                world.undoMove(Character.getNumericValue(newMove.charAt(0)), Character.getNumericValue(newMove.charAt(1)), Character.getNumericValue(newMove.charAt(2)), Character.getNumericValue(newMove.charAt(3)), undoInfo);
-            }
-            return bestMoveValue;
-        }
+
+        return min;
     }
 
-    private int evaluateWorld(@NotNull World world){
+    private float maxValue(World w, ArrayList<String> state, int depth){
+        if(depth >= this.depth)
+            return evaluateWorld(w,myColor);
+
+        float max = Float.NEGATIVE_INFINITY;
+        ArrayList<String> moves = w.getAvailableMovesAfterMove(state,oppColor);
+        if(moves.size() == EMPTY)
+            return Float.NEGATIVE_INFINITY;
+
+        for(int i=0; i<moves.size(); i++){
+            state.add(moves.get(i));
+            float tmp = minValue(w, state, depth+1);
+            if(tmp > max)
+                max = tmp;
+            state.remove(state.lastIndexOf(moves.get(i)));
+        }
+        return max;
+    }
+
+    private int evaluateWorld(World world, int color){
         int totalEvaluation = 0;
         for(int i=0; i<world.getRows(); i++){
             for(int j=0; j<world.getColumns(); j++){
-                totalEvaluation += getCellValue(world.getBoard()[i][j]);
+                totalEvaluation += getCellValue(world.getBoard()[i][j],color);
             }
         }
         return totalEvaluation;
     }
 
-    private int getCellValue(@NotNull String piece){
-        String firstLetter = Character.toString(piece.charAt(0));
-        int firstLetterINT;
-        String secondLetter = Character.toString(piece.charAt(1));
+    private int getCellValue(String piece, int color){
+        //System.out.println("\nPiece " + piece + " C: " + color);
+        try {
+            String firstLetter = Character.toString(piece.charAt(0));
+            String secondLetter = Character.toString(piece.charAt(1));
 
-        if(secondLetter.equals(" "))      // empty cell
+            if(secondLetter.equals(" "))      // empty cell
+                return 0;
+
+
+            int absoluteValue;
+
+            if(secondLetter.equals("P"))        // pawn
+                absoluteValue = 1;
+
+            else if(secondLetter.equals("R"))   // rook
+                absoluteValue = 3;
+
+            else                                // king
+                absoluteValue = 9;
+
+            if(firstLetter.equals("P"))         // prize
+                absoluteValue = 1;
+
+            if(color == myColor)
+                return absoluteValue;
+
+            else
+                return -absoluteValue;
+        }
+        catch (StringIndexOutOfBoundsException s){
             return 0;
-        
-
-        int absoluteValue;
-
-        if(secondLetter.equals("P"))        // pawn
-            absoluteValue = 1;
-        
-        else if(secondLetter.equals("R"))   // rook
-            absoluteValue = 3;
-        
-        else                                // king
-            absoluteValue = 9;
-        
-        if(firstLetter.equals("P"))         // prize
-            absoluteValue = 1;
-        
-
-        if(firstLetter.equals("W"))
-            firstLetterINT = 0;
-        
-        else
-            firstLetterINT = 1;
-        
-
-        if(firstLetterINT == world.getMyColor())
-            return absoluteValue;
-        
-        else
-            return -absoluteValue;
-        
-
+        }
     }
 
     public int getDepth() {

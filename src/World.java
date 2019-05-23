@@ -2,8 +2,9 @@ import java.util.ArrayList;
 import java.util.Random;
 
 
-public class World
-{
+public class World {
+	private static final int WHITE = 0;
+	private static final int BLACK = 1;
 	private String[][] board = null;
 	private int rows = 7;
 	private int columns = 5;
@@ -13,10 +14,8 @@ public class World
 	private int nTurns = 0;
 	private int nBranches = 0;
 	private int noPrize = 9;
-	private String minimaxBestMove;
 
-	public World()
-	{
+	public World(){
 		board = new String[rows][columns];
 		
 		/* represent the board
@@ -73,43 +72,43 @@ public class World
 		
 		availableMoves = new ArrayList<String>();
 	}
-
-	public void applyMinimax(boolean forMySelf){
-		Minimax minimax = new Minimax(forMySelf,this);
-		this.minimaxBestMove = minimax.applyMinimaxRoot();
-	}
 	
-	public void setMyColor(int myColor)
-	{
+	public void setMyColor(int myColor){
 		this.myColor = myColor;
 	}
 	
-	public String selectAction()
-	{
+	public String selectAction(boolean firstMove){
 		availableMoves = new ArrayList<String>();
 				
-		if(myColor == 0)		// I am the white player
+		if(myColor == WHITE)		// I am the white player
 			this.whiteMoves();
 		else					// I am the black player
 			this.blackMoves();
-		
+
+		Minimax minimax = new Minimax(2,this.myColor);
+		String minimaxMove = minimax.getMinimaxDecision(this);
+
 		// keeping track of the branch factor
 		nTurns++;
 		nBranches += availableMoves.size();
-		
-		return this.selectRandomAction();
+
+		if(firstMove || minimaxMove==null){
+			System.out.println("\nRandom");
+			return this.selectRandomAction();
+		}
+		else{
+			System.out.println("\nMinimaxxxx!!");
+			return minimaxMove;
+		}
 	}
 	
-	private void whiteMoves()
-	{
+	private void whiteMoves(){
 		String firstLetter = "";
 		String secondLetter = "";
 		String move = "";
-				
-		for(int i=0; i<rows; i++)
-		{
-			for(int j=0; j<columns; j++)
-			{
+
+		for(int i=0; i<rows; i++){
+			for(int j=0; j<columns; j++){
 				firstLetter = Character.toString(board[i][j].charAt(0));
 				
 				// if it there is not a white chess part in this position then keep on searching
@@ -119,12 +118,11 @@ public class World
 				// check the kind of the white chess part
 				secondLetter = Character.toString(board[i][j].charAt(1));
 				
-				if(secondLetter.equals("P"))	// it is a pawn
-				{
+				if(secondLetter.equals("P")){	// it is a pawn
+
 					// check if it can move towards the last row
 					if(i-1 == 0 && (Character.toString(board[i-1][j].charAt(0)).equals(" ") 
-							         || Character.toString(board[i-1][j].charAt(0)).equals("P")))
-					{
+							         || Character.toString(board[i-1][j].charAt(0)).equals("P"))){
 						move = Integer.toString(i) + Integer.toString(j) + 
 						       Integer.toString(i-1) + Integer.toString(j);
 						
@@ -135,8 +133,7 @@ public class World
 					// check if it can move one vertical position ahead
 					firstLetter = Character.toString(board[i-1][j].charAt(0));
 					
-					if(firstLetter.equals(" ") || firstLetter.equals("P"))
-					{
+					if(firstLetter.equals(" ") || firstLetter.equals("P")){
 						move = Integer.toString(i) + Integer.toString(j) + 
 							   Integer.toString(i-1) + Integer.toString(j);
 						
@@ -144,8 +141,7 @@ public class World
 					}
 					
 					// check if it can move crosswise to the left
-					if(j!=0 && i!=0)
-					{
+					if(j!=0 && i!=0){
 						firstLetter = Character.toString(board[i-1][j-1].charAt(0));
 						
 						if(firstLetter.equals("W") || firstLetter.equals(" ") || firstLetter.equals("P"))
@@ -158,8 +154,7 @@ public class World
 					}
 					
 					// check if it can move crosswise to the right
-					if(j!=columns-1 && i!=0)
-					{
+					if(j!=columns-1 && i!=0){
 						firstLetter = Character.toString(board[i-1][j+1].charAt(0));
 						
 						if(firstLetter.equals("W") || firstLetter.equals(" ") || firstLetter.equals("P"))
@@ -171,8 +166,8 @@ public class World
 						availableMoves.add(move);
 					}
 				}
-				else if(secondLetter.equals("R"))	// it is a rook
-				{
+				else if(secondLetter.equals("R")){	// it is a rook
+
 					// check if it can move upwards
 					for(int k=0; k<rookBlocks; k++)
 					{
@@ -195,8 +190,7 @@ public class World
 					}
 					
 					// check if it can move downwards
-					for(int k=0; k<rookBlocks; k++)
-					{
+					for(int k=0; k<rookBlocks; k++){
 						if((i+(k+1)) == rows)
 							break;
 						
@@ -216,8 +210,7 @@ public class World
 					}
 					
 					// check if it can move on the left
-					for(int k=0; k<rookBlocks; k++)
-					{
+					for(int k=0; k<rookBlocks; k++){
 						if((j-(k+1)) < 0)
 							break;
 						
@@ -237,8 +230,7 @@ public class World
 					}
 					
 					// check of it can move on the right
-					for(int k=0; k<rookBlocks; k++)
-					{
+					for(int k=0; k<rookBlocks; k++){
 						if((j+(k+1)) == columns)
 							break;
 						
@@ -257,11 +249,10 @@ public class World
 							break;
 					}
 				}
-				else // it is the king
-				{
+				else{// it is the king
+
 					// check if it can move upwards
-					if((i-1) >= 0)
-					{
+					if((i-1) >= 0){
 						firstLetter = Character.toString(board[i-1][j].charAt(0));
 						
 						if(!firstLetter.equals("W"))
@@ -274,12 +265,10 @@ public class World
 					}
 					
 					// check if it can move downwards
-					if((i+1) < rows)
-					{
+					if((i+1) < rows){
 						firstLetter = Character.toString(board[i+1][j].charAt(0));
 						
-						if(!firstLetter.equals("W"))
-						{
+						if(!firstLetter.equals("W")){
 							move = Integer.toString(i) + Integer.toString(j) + 
 								   Integer.toString(i+1) + Integer.toString(j);
 								
@@ -288,8 +277,7 @@ public class World
 					}
 					
 					// check if it can move on the left
-					if((j-1) >= 0)
-					{
+					if((j-1) >= 0){
 						firstLetter = Character.toString(board[i][j-1].charAt(0));
 						
 						if(!firstLetter.equals("W"))
@@ -302,8 +290,7 @@ public class World
 					}
 					
 					// check if it can move on the right
-					if((j+1) < columns)
-					{
+					if((j+1) < columns){
 						firstLetter = Character.toString(board[i][j+1].charAt(0));
 						
 						if(!firstLetter.equals("W"))
@@ -319,16 +306,13 @@ public class World
 		}
 	}
 	
-	private void blackMoves()
-	{
+	private void blackMoves(){
 		String firstLetter = "";
 		String secondLetter = "";
 		String move = "";
-				
-		for(int i=0; i<rows; i++)
-		{
-			for(int j=0; j<columns; j++)
-			{
+
+		for(int i=0; i<rows; i++){
+			for(int j=0; j<columns; j++){
 				firstLetter = Character.toString(board[i][j].charAt(0));
 				
 				// if it there is not a black chess part in this position then keep on searching
@@ -338,12 +322,11 @@ public class World
 				// check the kind of the white chess part
 				secondLetter = Character.toString(board[i][j].charAt(1));
 				
-				if(secondLetter.equals("P"))	// it is a pawn
-				{
+				if(secondLetter.equals("P")){	// it is a pawn
+
 					// check if it is at the last row
 					if(i+1 == rows-1 && (Character.toString(board[i+1][j].charAt(0)).equals(" ")
-										  || Character.toString(board[i+1][j].charAt(0)).equals("P")))
-					{
+										  || Character.toString(board[i+1][j].charAt(0)).equals("P"))){
 						move = Integer.toString(i) + Integer.toString(j) + 
 						       Integer.toString(i+1) + Integer.toString(j);
 						
@@ -354,8 +337,7 @@ public class World
 					// check if it can move one vertical position ahead
 					firstLetter = Character.toString(board[i+1][j].charAt(0));
 					
-					if(firstLetter.equals(" ") || firstLetter.equals("P"))
-					{
+					if(firstLetter.equals(" ") || firstLetter.equals("P")){
 						move = Integer.toString(i) + Integer.toString(j) + 
 							   Integer.toString(i+1) + Integer.toString(j);
 						
@@ -363,8 +345,7 @@ public class World
 					}
 					
 					// check if it can move crosswise to the left
-					if(j!=0 && i!=rows-1)
-					{
+					if(j!=0 && i!=rows-1){
 						firstLetter = Character.toString(board[i+1][j-1].charAt(0));
 						
 						if(firstLetter.equals("B") || firstLetter.equals(" ") || firstLetter.equals("P"))
@@ -377,8 +358,7 @@ public class World
 					}
 					
 					// check if it can move crosswise to the right
-					if(j!=columns-1 && i!=rows-1)
-					{
+					if(j!=columns-1 && i!=rows-1){
 						firstLetter = Character.toString(board[i+1][j+1].charAt(0));
 						
 						if(firstLetter.equals("B") || firstLetter.equals(" ") || firstLetter.equals("P"))
@@ -390,11 +370,10 @@ public class World
 						availableMoves.add(move);
 					}
 				}
-				else if(secondLetter.equals("R"))	// it is a rook
-				{
+				else if(secondLetter.equals("R")){	// it is a rook
+
 					// check if it can move upwards
-					for(int k=0; k<rookBlocks; k++)
-					{
+					for(int k=0; k<rookBlocks; k++){
 						if((i-(k+1)) < 0)
 							break;
 						
@@ -414,8 +393,7 @@ public class World
 					}
 					
 					// check if it can move downwards
-					for(int k=0; k<rookBlocks; k++)
-					{
+					for(int k=0; k<rookBlocks; k++){
 						if((i+(k+1)) == rows)
 							break;
 						
@@ -435,8 +413,7 @@ public class World
 					}
 					
 					// check if it can move on the left
-					for(int k=0; k<rookBlocks; k++)
-					{
+					for(int k=0; k<rookBlocks; k++){
 						if((j-(k+1)) < 0)
 							break;
 						
@@ -456,8 +433,7 @@ public class World
 					}
 					
 					// check of it can move on the right
-					for(int k=0; k<rookBlocks; k++)
-					{
+					for(int k=0; k<rookBlocks; k++){
 						if((j+(k+1)) == columns)
 							break;
 						
@@ -476,15 +452,13 @@ public class World
 							break;
 					}
 				}
-				else // it is the king
-				{
+				else{ // it is the king
+
 					// check if it can move upwards
-					if((i-1) >= 0)
-					{
+					if((i-1) >= 0){
 						firstLetter = Character.toString(board[i-1][j].charAt(0));
 						
-						if(!firstLetter.equals("B"))
-						{
+						if(!firstLetter.equals("B")){
 							move = Integer.toString(i) + Integer.toString(j) + 
 								   Integer.toString(i-1) + Integer.toString(j);
 								
@@ -493,12 +467,10 @@ public class World
 					}
 					
 					// check if it can move downwards
-					if((i+1) < rows)
-					{
+					if((i+1) < rows){
 						firstLetter = Character.toString(board[i+1][j].charAt(0));
 						
-						if(!firstLetter.equals("B"))
-						{
+						if(!firstLetter.equals("B")){
 							move = Integer.toString(i) + Integer.toString(j) + 
 								   Integer.toString(i+1) + Integer.toString(j);
 								
@@ -507,12 +479,10 @@ public class World
 					}
 					
 					// check if it can move on the left
-					if((j-1) >= 0)
-					{
+					if((j-1) >= 0){
 						firstLetter = Character.toString(board[i][j-1].charAt(0));
 						
-						if(!firstLetter.equals("B"))
-						{
+						if(!firstLetter.equals("B")){
 							move = Integer.toString(i) + Integer.toString(j) + 
 								   Integer.toString(i) + Integer.toString(j-1);
 								
@@ -521,12 +491,10 @@ public class World
 					}
 					
 					// check if it can move on the right
-					if((j+1) < columns)
-					{
+					if((j+1) < columns){
 						firstLetter = Character.toString(board[i][j+1].charAt(0));
 						
-						if(!firstLetter.equals("B"))
-						{
+						if(!firstLetter.equals("B")){
 							move = Integer.toString(i) + Integer.toString(j) + 
 								   Integer.toString(i) + Integer.toString(j+1);
 								
@@ -538,46 +506,31 @@ public class World
 		}
 	}
 	
-	private String selectRandomAction()
-	{		
+	private String selectRandomAction(){
 		Random ran = new Random();
 		int x = ran.nextInt(availableMoves.size());
 		
 		return availableMoves.get(x);
 	}
 	
-	public double getAvgBFactor()
-	{
+	public double getAvgBFactor() {
 		return nBranches / (double) nTurns;
 	}
 	
-	public String[] makeMove(int x1, int y1, int x2, int y2, int prizeX, int prizeY)
-	{
-		System.out.println(board[x1][y1]);
+	public void makeMove(int x1, int y1, int x2, int y2, int prizeX, int prizeY){
 		String chessPart = Character.toString(board[x1][y1].charAt(1));
 		
-		boolean pawnLastRow = false;
-		String oldValue = "";
-		String newValue = "";
-
-		String[] undoInfo = new String[2];
-		
+		boolean pawnLastRow = false;	
 		// check if it is a move that has made a move to the last line
 		if(chessPart.equals("P"))
-			if( (x1==rows-2 && x2==rows-1) || (x1==1 && x2==0) )
-			{
-				oldValue = board[x2][y2];
-				newValue = board[x1][y1];
+			if( (x1==rows-2 && x2==rows-1) || (x1==1 && x2==0) ){
 				board[x2][y2] = " ";	// in a case an opponent's chess part has just been captured
 				board[x1][y1] = " ";
 				pawnLastRow = true;
 			}
 		
 		// otherwise
-		if(!pawnLastRow)
-		{
-			oldValue = board[x2][y2];
-			newValue = board[x1][y1];
+		if(!pawnLastRow){
 			board[x2][y2] = board[x1][y1];
 			board[x1][y1] = " ";
 		}
@@ -586,20 +539,40 @@ public class World
 		if(prizeX != noPrize){
 			board[prizeX][prizeY] = "P";
 		}
-
-		undoInfo[0] = oldValue;
-		undoInfo[1] = newValue;
-
-		return undoInfo;
-	}
-
-	public void undoMove(int x1, int y1, int x2, int y2, String[] undoInfo){
-		board[x1][y1] = undoInfo[0];
-		board[x2][y2] = undoInfo[1];
 	}
 
 	public ArrayList<String> getAvailableMoves() {
 		return availableMoves;
+	}
+
+	public ArrayList<String> getAvailableMovesAfterMove(ArrayList<String> state, int color){
+
+
+		World tempWorld = new World();
+		tempWorld.setMyColor(color);
+
+		for(int y=0; y<tempWorld.getColumns(); y++){
+			for (int x=0; x<tempWorld.getRows(); x++){
+				tempWorld.getBoard()[x][y] = this.board[x][y];
+			}
+		}
+
+		for(int i=0; i<state.size(); i++){
+			int x1 = Character.getNumericValue(state.get(i).charAt(0));
+			int y1 = Character.getNumericValue(state.get(i).charAt(1));
+			int x2 = Character.getNumericValue(state.get(i).charAt(2));
+			int y2 = Character.getNumericValue(state.get(i).charAt(3));
+			tempWorld.makeMove(x1, y1, x2, y2, 9, 9);
+		}
+
+		if(tempWorld.getMyColor() == WHITE)
+			tempWorld.whiteMoves();
+		else
+			tempWorld.blackMoves();
+
+		ArrayList<String> futureMoves = tempWorld.getAvailableMoves();
+
+		return futureMoves;
 	}
 
 	public String[][] getBoard() {
