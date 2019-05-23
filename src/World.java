@@ -92,7 +92,7 @@ public class World {
 		nTurns++;
 		nBranches += availableMoves.size();
 
-		if(firstMove || minimaxMove==null){
+		if(firstMove || minimaxMove == null){
 			System.out.println("\nRandom");
 			return this.selectRandomAction();
 		}
