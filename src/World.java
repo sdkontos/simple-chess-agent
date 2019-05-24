@@ -85,8 +85,8 @@ public class World {
 		else					// I am the black player
 			this.blackMoves();
 
-		Minimax minimax = new Minimax(2,this.myColor);
-		String minimaxMove = minimax.getMinimaxDecision(this);
+		MinimaxAlphaBeta minimaxAB = new MinimaxAlphaBeta(6,this.myColor);
+		String minimaxMove = minimaxAB.getMinimaxDecision(this);
 
 		// keeping track of the branch factor
 		nTurns++;
@@ -97,7 +97,6 @@ public class World {
 			return this.selectRandomAction();
 		}
 		else{
-			System.out.println("\nMinimaxxxx!!");
 			return minimaxMove;
 		}
 	}
@@ -573,6 +572,26 @@ public class World {
 		ArrayList<String> futureMoves = tempWorld.getAvailableMoves();
 
 		return futureMoves;
+	}
+
+	public String[][] getBoardAfterMove(ArrayList<String> state){
+		World tempWorld = new World();
+
+		for(int y=0; y<tempWorld.getColumns(); y++){
+			for (int x=0; x<tempWorld.getRows(); x++){
+				tempWorld.getBoard()[x][y] = this.board[x][y];
+			}
+		}
+
+		for(int i=0; i<state.size(); i++){
+			int x1 = Character.getNumericValue(state.get(i).charAt(0));
+			int y1 = Character.getNumericValue(state.get(i).charAt(1));
+			int x2 = Character.getNumericValue(state.get(i).charAt(2));
+			int y2 = Character.getNumericValue(state.get(i).charAt(3));
+			tempWorld.makeMove(x1, y1, x2, y2, 9, 9);
+		}
+
+		return tempWorld.getBoard();
 	}
 
 	public String[][] getBoard() {

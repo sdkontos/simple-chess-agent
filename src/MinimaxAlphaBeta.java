@@ -2,7 +2,7 @@ import java.lang.*;
 import java.util.ArrayList;
 import java.util.Random;
 
-public class Minimax {
+public class MinimaxAlphaBeta {
 
     private static final int WHITE = 0;
     private static final int EMPTY = 0;
@@ -14,7 +14,7 @@ public class Minimax {
     Random rand;
 
 
-    public Minimax(int depth, int myColor) {
+    public MinimaxAlphaBeta(int depth, int myColor) {
 
         this.depth = depth;
         this.myColor = myColor;
@@ -37,7 +37,7 @@ public class Minimax {
         // get best move
         for(int i=0; i<availableMoves.size(); i++) {
             state.add(availableMoves.get(i));
-            float tmpCost = minValue(world,state,1);
+            float tmpCost = minValue(world,state, Float.NEGATIVE_INFINITY, Float.POSITIVE_INFINITY,1);
             costs[i] = tmpCost;
             state.remove(state.lastIndexOf(availableMoves.get(i)));
         }
@@ -63,14 +63,12 @@ public class Minimax {
 
     }
 
-    private float minValue(World w, ArrayList<String> state,int depth){
+    private float minValue(World w, ArrayList<String> state, float alpha, float beta, int depth){
 
         if(depth > this.depth){
             String [][] b = w.getBoardAfterMove(state);
             return evaluateWorld(w, b, oppColor);
         }
-
-        float min = Float.POSITIVE_INFINITY;
 
         ArrayList<String> moves = w.getAvailableMovesAfterMove(state,oppColor);
 
@@ -80,22 +78,23 @@ public class Minimax {
         for(int i=0; i<moves.size(); i++){
 
             state.add(moves.get(i));
-            float tmp = maxValue(w, state,depth+1);
+            float tmp = maxValue(w, state, alpha, beta,depth+1);
             state.remove(state.lastIndexOf(moves.get(i)));
 
-            if(tmp < min)
-                min = tmp;
+            if(tmp < beta)
+                beta = tmp;
+
+            if(beta <= alpha)
+                break;
         }
-        return min;
+        return beta;
     }
 
-    private float maxValue(World w, ArrayList<String> state,int depth){
+    private float maxValue(World w, ArrayList<String> state, float alpha, float beta, int depth){
         if(depth > this.depth){
             String [][] b = w.getBoardAfterMove(state);
             return evaluateWorld(w, b, myColor);
         }
-
-        float max = Float.NEGATIVE_INFINITY;
 
         ArrayList<String> moves = w.getAvailableMovesAfterMove(state,myColor);
         if(moves.size() == EMPTY)
@@ -103,13 +102,16 @@ public class Minimax {
 
         for(int i=0; i<moves.size(); i++){
             state.add(moves.get(i));
-            float tmp = minValue(w, state, depth+1);
+            float tmp = minValue(w, state, alpha, beta, depth+1);
             state.remove(state.lastIndexOf(moves.get(i)));
 
-            if(tmp > max)
-                max = tmp;
+            if(tmp > alpha)
+                alpha = tmp;
+
+            if(beta <= alpha)
+                break;
         }
-        return max;
+        return alpha;
     }
 
     private int evaluateWorld(World world, String[][] board, int color){
