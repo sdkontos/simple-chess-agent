@@ -12,12 +12,21 @@ public class MinimaxAlphaBeta {
     private int myColor;
     private int oppColor;
     Random rand;
-
+    private int[][] evalWhiteSidePawns;
+    private int[][] evalWhiteCenterPawns;
+    private int[][] evalWhiteRooks;
+    private int[][] evalWhiteKing;
+    private int[][] evalBlackSidePawns;
+    private int[][] evalBlackCenterPawns;
+    private int[][] evalBlackRooks;
+    private int[][] evalBlackKing;
 
     public MinimaxAlphaBeta(int depth, int myColor) {
 
         this.depth = depth;
         this.myColor = myColor;
+
+        initializeEvaluatedPawns();
 
         rand = new Random();
 
@@ -118,35 +127,48 @@ public class MinimaxAlphaBeta {
         int totalEvaluation = 0;
         for(int i=0; i<world.getRows(); i++){
             for(int j=0; j<world.getColumns(); j++){
-                totalEvaluation += getCellValue(board[i][j], color);
+                totalEvaluation += getCellValue(board[i][j], color,i, j);
             }
         }
         return totalEvaluation;
     }
 
-    private int getCellValue(String piece, int color){
+    private int getCellValue(String piece, int color, int i, int j){
 
         try {
             char firstLetter = piece.charAt(0);
             char secondLetter = piece.charAt(1);
 
-            if(secondLetter == ' ')      // empty cell
+            if(firstLetter == ' ')      // empty cell
                 return 0;
 
 
             int absoluteValue;
 
-            if(secondLetter == 'P')        // pawn
-                absoluteValue = 1;
+            if(secondLetter == 'P'){      // pawn
+                if(color == WHITE)
+                    absoluteValue = 2 + evalWhiteCenterPawns[i][j];
+                else
+                    absoluteValue = 2 + evalBlackCenterPawns[i][j];
+            }
 
-            else if(secondLetter == 'R')   // rook
-                absoluteValue = 3;
+            else if(secondLetter == 'R') {   // rook
+                if(color == WHITE)
+                    absoluteValue = 6 + evalWhiteRooks[i][j];
+                else
+                    absoluteValue = 6 + evalBlackRooks[i][j];
+            }
 
-            else                           // king
-                absoluteValue = 9;
+            else{ // king
+                if(color == WHITE)
+                    absoluteValue = 18 + evalWhiteKing[i][j];
+                else
+                    absoluteValue = 18 + evalBlackKing[i][j];
+            }
+
 
             if(firstLetter == 'P')         // prize
-                absoluteValue = 10;
+                absoluteValue = 2;
 
             if(color == myColor){
                 return absoluteValue;
@@ -157,6 +179,64 @@ public class MinimaxAlphaBeta {
         }
         catch (StringIndexOutOfBoundsException s){
             return 0;
+        }
+    }
+
+    private void initializeEvaluatedPawns(){
+        evalWhiteSidePawns = new int[][]{
+                {1, 2, 3, 2, 1},
+                {-1, 1, 2, 1, -1},
+                {-1, 1, 2, 1, -1},
+                {0, 1, 2, 1, 0},
+                {0, 1, 2, 1, 0},
+                {-1, 2, 0, 2, -1},
+                {-1, 0, 0, 0, -1}
+        };
+
+        evalWhiteCenterPawns = new int[][]{
+                {0, 0, 0, 0, 0},
+                {1, -1, -1, -1, 1},
+                {1, -1, -1, -1, 1},
+                {1, 1, -1, 1, 1},
+                {2, 2, 2, 2, 2},
+                {0, -2, 2, -2, 0},
+                {0, 0, 0, 0, 0}
+        };
+
+        evalWhiteRooks = new int[][]{
+                {0, 0, 1, 0, 0},
+                {0, 0, 1, 0, 0},
+                {0, 0, 1, 0, 0},
+                {0, 1, 1, 1, 0},
+                {0, 0, 1, 0, 0},
+                {0, 0, 1, 0, 0},
+                {0, 0, 1, 0, 0}
+        };
+
+        evalWhiteKing = new int[][]{
+                {-10, -10, -10, -10, -10},
+                {-8, -8, -10, -8, -8},
+                {-6, -7, -7, -7, -6},
+                {-4, -4, -5, -4, -4},
+                {-1, -1, -1, -1, -1},
+                {1, 2, 0, 2, 1},
+                {2, 4, 0, 4, 2}
+        };
+
+        evalBlackSidePawns = new int[7][5];
+        evalBlackCenterPawns = new int[7][5];
+        evalBlackRooks = new int[7][5];
+        evalBlackKing = new int[7][5];
+
+        // reverse for black
+
+        for(int i=0; i<7; i++){
+            for(int j=0; j<5; j++){
+                evalBlackSidePawns[i][j] = evalWhiteSidePawns[6-i][j];
+                evalBlackCenterPawns[i][j] = evalWhiteCenterPawns[6-i][j];
+                evalBlackRooks[i][j] = evalWhiteRooks[6-i][j];
+                evalBlackKing[i][j] = evalWhiteKing[6-i][j];
+            }
         }
     }
 

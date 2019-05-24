@@ -56,7 +56,7 @@ public class Client{
 	
 	private void sendName(){
 		// add your name here, remove comment below
-		myName = "minimax";
+		myName = "primary";
 		
 		try{
 			// turn my name into bytes

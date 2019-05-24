@@ -15,6 +15,8 @@ public class World {
 	private int nBranches = 0;
 	private int noPrize = 9;
 
+
+
 	public World(){
 		board = new String[rows][columns];
 		
@@ -85,20 +87,23 @@ public class World {
 		else					// I am the black player
 			this.blackMoves();
 
-		MinimaxAlphaBeta minimaxAB = new MinimaxAlphaBeta(6,this.myColor);
-		String minimaxMove = minimaxAB.getMinimaxDecision(this);
+		String ai_choice;
+
+		//Minimax minimax = new Minimax(3,this.myColor);
+		//ai_choice = minimax.getMinimaxDecision(this);
+
+		MinimaxAlphaBeta minimaxAB = new MinimaxAlphaBeta(3,this.myColor);
+		ai_choice = minimaxAB.getMinimaxDecision(this);
 
 		// keeping track of the branch factor
 		nTurns++;
 		nBranches += availableMoves.size();
 
-		if(firstMove || minimaxMove == null){
-			System.out.println("\nRandom");
+		if(firstMove || ai_choice == null)
 			return this.selectRandomAction();
-		}
-		else{
-			return minimaxMove;
-		}
+		else
+			return ai_choice;
+
 	}
 	
 	private void whiteMoves(){
@@ -609,5 +614,7 @@ public class World {
 	public int getColumns() {
 		return columns;
 	}
+
+
 
 }
