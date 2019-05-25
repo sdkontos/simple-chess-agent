@@ -87,6 +87,9 @@ public class World {
 		else					// I am the black player
 			this.blackMoves();
 
+		if(firstMove)
+			return "5141";
+
 		String ai_choice;
 
 		//Minimax minimax = new Minimax(3,this.myColor);
@@ -99,7 +102,7 @@ public class World {
 		nTurns++;
 		nBranches += availableMoves.size();
 
-		if(firstMove || ai_choice == null)
+		if(ai_choice == null)
 			return this.selectRandomAction();
 		else
 			return ai_choice;

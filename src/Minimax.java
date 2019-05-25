@@ -76,7 +76,7 @@ public class Minimax {
 
         if(depth > this.depth){
             String [][] b = w.getBoardAfterMove(state);
-            return evaluateWorld(w, b, oppColor);
+            return evaluateWorld(w, b);
         }
 
         float min = Float.POSITIVE_INFINITY;
@@ -101,7 +101,7 @@ public class Minimax {
     private float maxValue(World w, ArrayList<String> state,int depth){
         if(depth > this.depth){
             String [][] b = w.getBoardAfterMove(state);
-            return evaluateWorld(w, b, myColor);
+            return evaluateWorld(w, b);
         }
 
         float max = Float.NEGATIVE_INFINITY;
@@ -121,22 +121,27 @@ public class Minimax {
         return max;
     }
 
-    private int evaluateWorld(World world, String[][] board, int color){
+    private int evaluateWorld(World world, String[][] board){
         int totalEvaluation = 0;
         for(int i=0; i<world.getRows(); i++){
             for(int j=0; j<world.getColumns(); j++){
-                totalEvaluation += getCellValue(board[i][j], color,i, j);
+                totalEvaluation += getCellValue(board[i][j], i, j);
             }
         }
         return totalEvaluation;
     }
 
-    private int getCellValue(String piece, int color, int i, int j){
+    private int getCellValue(String piece, int i, int j){
+        int color = WHITE;
 
         try {
             char firstLetter = piece.charAt(0);
             char secondLetter = piece.charAt(1);
 
+            if(firstLetter == 'W')
+                color = WHITE;
+            else if(firstLetter == 'B')
+                color = BLACK;
             if(firstLetter == ' ')      // empty cell
                 return 0;
 
@@ -152,21 +157,21 @@ public class Minimax {
 
             else if(secondLetter == 'R') {   // rook
                 if(color == WHITE)
-                    absoluteValue = 6 + evalWhiteRooks[i][j];
+                    absoluteValue = 10 + evalWhiteRooks[i][j];
                 else
-                    absoluteValue = 6 + evalBlackRooks[i][j];
+                    absoluteValue = 10 + evalBlackRooks[i][j];
             }
 
             else{ // king
                 if(color == WHITE)
-                    absoluteValue = 18 + evalWhiteKing[i][j];
+                    absoluteValue = 50 + evalWhiteKing[i][j];
                 else
-                    absoluteValue = 18 + evalBlackKing[i][j];
+                    absoluteValue = 50 + evalBlackKing[i][j];
             }
 
 
             if(firstLetter == 'P')         // prize
-                absoluteValue = 2;
+                absoluteValue = 5;
 
             if(color == myColor){
                 return absoluteValue;
@@ -192,23 +197,25 @@ public class Minimax {
         };
 
         evalWhiteCenterPawns = new int[][]{
+                {1, 1, 1, 1, 1},
+                {1, 1, 1, 1, 1},
                 {0, 0, 0, 0, 0},
-                {-1, -1, -1, -1, -1},
-                {-1, -1, -1, -1, -1},
-                {1, 1, -1, 1, 1},
-                {2, 2, 2, 2, 2},
-                {0, -2, 2, -2, 0},
+                {0, 0, -1, 0, 0},
+                {0, 0, -1, 0, 0},
+                {0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0},
                 {0, 0, 0, 0, 0}
         };
 
         evalWhiteRooks = new int[][]{
-                {4, 3, 3, 3, 4},
-                {1, 2, 3, 2, 1},
-                {1, 2, 3, 2, 1},
-                {1, 2, 3, 2, 1},
-                {1, 2, 3, 2, 1},
-                {0, 1, 2, 1, 0},
-                {0, 0, 1, 0, 0}
+                {0, 0, 0, 0, 0},
+                {0, 0, -1, 0, 0},
+                {0, 0, -1, 0, 0},
+                {0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0}
         };
 
         evalWhiteKing = new int[][]{
@@ -217,16 +224,15 @@ public class Minimax {
                 {-6, -7, -7, -7, -6},
                 {-4, -4, -5, -4, -4},
                 {-1, -1, -1, -1, -1},
-                {1, 2, 0, 2, 1},
-                {2, 4, 0, 4, 2}
+                {1, 1, 0, 1, 1},
+                {1, 1, 0, 1, 1}
         };
 
+        // reverse arrays for black pawns
         evalBlackSidePawns = new int[7][5];
         evalBlackCenterPawns = new int[7][5];
         evalBlackRooks = new int[7][5];
         evalBlackKing = new int[7][5];
-
-        // reverse for black
 
         for(int i=0; i<7; i++){
             for(int j=0; j<5; j++){
