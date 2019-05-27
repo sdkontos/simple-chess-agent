@@ -99,6 +99,7 @@ public class MinimaxAlphaBeta {
     }
 
     private float maxValue(World w, ArrayList<String> state, float alpha, float beta, int depth){
+
         if(depth > this.depth){
             String [][] b = w.getBoardAfterMove(state);
             return evaluateWorld(w, b);
@@ -121,6 +122,7 @@ public class MinimaxAlphaBeta {
         }
         return alpha;
     }
+
 
     private int evaluateWorld(World world, String[][] board){
         int totalEvaluation = 0;
