@@ -93,10 +93,10 @@ public class World {
 		String ai_choice;
 
 		//Minimax minimax = new Minimax(3,this.myColor);
-		//ai_choice = minimax.getMinimaxDecision(this);
+		//ai_choice = minimax.decide(this);
 
 		MinimaxAlphaBeta minimaxAB = new MinimaxAlphaBeta(3,this.myColor);
-		ai_choice = minimaxAB.getMinimaxDecision(this);
+		ai_choice = minimaxAB.decide(this);
 
 		// keeping track of the branch factor
 		nTurns++;

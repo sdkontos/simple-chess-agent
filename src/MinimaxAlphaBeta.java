@@ -10,7 +10,7 @@ public class MinimaxAlphaBeta {
     private int depth;
     private int myColor;
     private int oppColor;
-    Random rand;
+    private Random rand;
     private int[][] evalWhiteSidePawns;
     private int[][] evalWhiteCenterPawns;
     private int[][] evalWhiteRooks;
@@ -35,7 +35,7 @@ public class MinimaxAlphaBeta {
             oppColor = WHITE;
     }
 
-    public String getMinimaxDecision(World world){
+    public String decide(World world){
 
         ArrayList<String> availableMoves = world.getAvailableMoves();
         ArrayList<String> state = new ArrayList<>();
@@ -64,10 +64,10 @@ public class MinimaxAlphaBeta {
 
         if(maxIndex == -1)
             return null;
-        else{
-            String bestMove = availableMoves.get(maxIndex);
-            return bestMove;
-        }
+
+        else
+            return availableMoves.get(maxIndex);
+
 
     }
 

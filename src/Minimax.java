@@ -36,7 +36,7 @@ public class Minimax {
             oppColor = WHITE;
     }
 
-    public String getMinimaxDecision(World world){
+    public String decide(World world){
 
         ArrayList<String> availableMoves = world.getAvailableMoves();
         ArrayList<String> state = new ArrayList<>();
