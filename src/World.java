@@ -80,21 +80,19 @@ public class World {
 	}
 	
 	public String selectAction(boolean firstMove){
-		availableMoves = new ArrayList<String>();
+		String ai_choice;
+		availableMoves = new ArrayList<>();
 				
-		if(myColor == WHITE)		// I am the white player
+		if(myColor == WHITE)	// I am the white player
 			this.whiteMoves();
 		else					// I am the black player
 			this.blackMoves();
 
-		if(firstMove)
+		if(firstMove) // open move, unnecessary minimax algorithm decision
 			return "5141";
-
-		String ai_choice;
 
 		//Minimax minimax = new Minimax(3,this.myColor);
 		//ai_choice = minimax.decide(this);
-
 		MinimaxAlphaBeta minimaxAB = new MinimaxAlphaBeta(3,this.myColor);
 		ai_choice = minimaxAB.decide(this);
 
@@ -102,11 +100,10 @@ public class World {
 		nTurns++;
 		nBranches += availableMoves.size();
 
-		if(ai_choice == null)
+		if(ai_choice == null) // in case of minimax failure
 			return this.selectRandomAction();
 		else
 			return ai_choice;
-
 	}
 	
 	private void whiteMoves(){
