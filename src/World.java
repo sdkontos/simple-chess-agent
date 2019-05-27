@@ -91,9 +91,9 @@ public class World {
 		if(firstMove) // open move, unnecessary minimax algorithm decision
 			return "5141";
 
-		//Minimax minimax = new Minimax(Client.DEPTH,this.myColor);
+		//Minimax minimax = new Minimax(Client.MINIMAX_DEPTH,this.myColor);
 		//ai_choice = minimax.decide(this);
-		MinimaxAlphaBeta minimaxAB = new MinimaxAlphaBeta(Client.DEPTH,this.myColor);
+		MinimaxAlphaBeta minimaxAB = new MinimaxAlphaBeta(Client.MINIMAX_DEPTH,this.myColor);
 		ai_choice = minimaxAB.decide(this);
 
 		// keeping track of the branch factor

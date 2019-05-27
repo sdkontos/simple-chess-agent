@@ -19,14 +19,13 @@ public class Client{
 	private InetAddress host = null;
 	
 	private String myName = "client";
-	// private int counterMsg = 0;		optional use
 	private String receivedMsg = "";
 	private int myColor = 0;
-	private World world = null;
+	private World world;
 	private int scoreWhite = 0;
 	private int scoreBlack = 0;
-	private int delay = 10;		// never set it to 0
-	public static final int DEPTH = 3; // change depth here
+	private int delay = 10;				// never set it to 0
+	public static final int MINIMAX_DEPTH = 3;	// change minimax depth here
 	
 	public Client(){
 		// initialization of the fields
@@ -226,11 +225,7 @@ public class Client{
 	{
 		return scoreBlack;
 	}
-
-	public static int getDEPTH() {
-		return DEPTH;
-	}
-
+	
 	// testing
 	public static void main(String[] args){
 		Client client = new Client();
