@@ -244,12 +244,4 @@ public class Minimax {
         }
     }
 
-    public int getDepth() {
-        return depth;
-    }
-
-    public void setDepth(int depth) {
-        this.depth = depth;
-    }
-
 }

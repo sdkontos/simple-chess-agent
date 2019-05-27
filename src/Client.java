@@ -26,6 +26,7 @@ public class Client{
 	private int scoreWhite = 0;
 	private int scoreBlack = 0;
 	private int delay = 10;		// never set it to 0
+	public static final int DEPTH = 3; // change depth here
 	
 	public Client(){
 		// initialization of the fields
@@ -225,7 +226,11 @@ public class Client{
 	{
 		return scoreBlack;
 	}
-	
+
+	public static int getDEPTH() {
+		return DEPTH;
+	}
+
 	// testing
 	public static void main(String[] args){
 		Client client = new Client();
