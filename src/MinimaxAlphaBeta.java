@@ -123,6 +123,44 @@ public class MinimaxAlphaBeta {
         return alpha;
     }
 
+    private float pvSearch(World w, ArrayList<String> state, float alpha, float beta, int depth, int color){
+
+        float score;
+
+        if(depth > this.depth){
+            String [][] b = w.getBoardAfterMove(state);
+            return evaluateWorld(w, b);
+        }
+
+        boolean bSearchPV = colorToBool(color);
+
+        ArrayList<String> moves = w.getAvailableMovesAfterMove(state,color);
+
+        for(int i=0; i<moves.size(); i++){
+
+            state.add(moves.get(i));
+            if(bSearchPV)
+                score = -pvSearch(w, state, -beta, -alpha, depth + 1, oppositeColor(color));
+            else{
+                score = -pvSearch(w, state, -alpha-1, -alpha, depth+1, oppositeColor(color));
+                if(score > alpha) // fail-soft
+                    score = -pvSearch(w, state, -beta, -alpha, depth+1 , oppositeColor(color));
+            }
+            state.remove(state.lastIndexOf(moves.get(i)));
+
+            if(score >= beta)
+                return beta; // fail hard -> beta cut-off
+
+            if(score > alpha)
+                alpha = score; // like Minimax
+
+            bSearchPV = colorToBool(oppositeColor(color));
+
+        }
+
+        return alpha; // fail hard -> alpha cut-off
+
+    }
 
     private int evaluateWorld(World world, String[][] board){
         int totalEvaluation = 0;
@@ -245,5 +283,21 @@ public class MinimaxAlphaBeta {
                 evalBlackKing[i][j] = evalWhiteKing[6-i][j];
             }
         }
+    }
+
+    private int oppositeColor(int color){
+
+        if(color == WHITE){
+            return BLACK;
+        }
+        else
+            return WHITE;
+    }
+
+    private boolean colorToBool(int color){
+        if(color == WHITE)
+            return true;
+        else
+            return false;
     }
 }
