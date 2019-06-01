@@ -143,7 +143,7 @@ public class MinimaxAlphaBeta {
                 score = -pvSearch(w, state, -beta, -alpha, depth + 1, oppositeColor(color));
             else{
                 score = -pvSearch(w, state, -alpha-1, -alpha, depth+1, oppositeColor(color));
-                if(score > alpha) // fail-soft
+                if(score > alpha) // fail-soft -> re-search
                     score = -pvSearch(w, state, -beta, -alpha, depth+1 , oppositeColor(color));
             }
             state.remove(state.lastIndexOf(moves.get(i)));
