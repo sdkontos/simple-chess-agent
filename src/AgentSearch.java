@@ -2,11 +2,16 @@ import java.lang.*;
 import java.util.ArrayList;
 import java.util.Random;
 
-public class MinimaxAlphaBeta {
+public class AgentSearch {
 
     private static final int WHITE = 0;
-    private static final int EMPTY = 0;
     private static final int BLACK = 1;
+    private static final int MINIMAX = 111;
+    private static final int MINIMAX_ALPHA_BETA = 222;
+    private static final int MINIMAX_PV = 333;
+    private static final int MINIMAX_PV_WITH_NULL_WINDOW = 444;
+    private static final int EMPTY = 0;
+
     private int depth;
     private int myColor;
     private int oppColor;
@@ -19,11 +24,13 @@ public class MinimaxAlphaBeta {
     private int[][] evalBlackCenterPawns;
     private int[][] evalBlackRooks;
     private int[][] evalBlackKing;
+    private int algorithmChoosed;
 
-    public MinimaxAlphaBeta(int depth, int myColor) {
+    public AgentSearch(int depth, int myColor, int algorithmChoosed) {
 
         this.depth = depth;
         this.myColor = myColor;
+        this.algorithmChoosed = algorithmChoosed;
 
         initializeEvaluatedPawns();
 
@@ -41,19 +48,28 @@ public class MinimaxAlphaBeta {
         ArrayList<String> state = new ArrayList<>();
 
         float[] costs = new float[availableMoves.size()];
+        float tmpCost;
 
         // get best move
         for(int i=0; i<availableMoves.size(); i++) {
             state.add(availableMoves.get(i));
 
-            // Alpha - Beta Minimax
-            float tmpCost = minValue(world,state, Float.NEGATIVE_INFINITY, Float.POSITIVE_INFINITY,1);
-
-            // PV Search Minimax
-            //float tmpCost = pvSearch(world,state, Float.NEGATIVE_INFINITY, Float.POSITIVE_INFINITY,1,oppColor);
-
-            // PV Search with Null-Window Search Minimax
-            //float tmpCost = pvSearchNW(world,state, Float.NEGATIVE_INFINITY, Float.POSITIVE_INFINITY,1,oppColor);
+            switch (algorithmChoosed){
+                case MINIMAX:
+                    tmpCost = minVal(world,state,1);
+                    break;
+                case MINIMAX_ALPHA_BETA:
+                    tmpCost = minValue(world,state, Float.NEGATIVE_INFINITY, Float.POSITIVE_INFINITY,1);
+                    break;
+                case MINIMAX_PV: // Principal Variation Search
+                    tmpCost = pvSearch(world,state, Float.NEGATIVE_INFINITY, Float.POSITIVE_INFINITY,1,oppColor);
+                    break;
+                case MINIMAX_PV_WITH_NULL_WINDOW: // Principal Variation Search with Null Window Search
+                    tmpCost = pvSearchNW(world,state, Float.NEGATIVE_INFINITY, Float.POSITIVE_INFINITY,1,oppColor);
+                    break;
+                default: // very bad news!
+                    tmpCost = -1;
+            }
 
             costs[i] = tmpCost;
             state.remove(state.lastIndexOf(availableMoves.get(i)));
@@ -78,6 +94,55 @@ public class MinimaxAlphaBeta {
             return availableMoves.get(maxIndex);
 
 
+    }
+
+    private float minVal(World w, ArrayList<String> state,int depth){
+
+        if(depth > this.depth){
+            String [][] b = w.getBoardAfterMove(state);
+            return evaluateWorld(w, b);
+        }
+
+        float min = Float.POSITIVE_INFINITY;
+
+        ArrayList<String> moves = w.getAvailableMovesAfterMove(state,oppColor);
+
+        if(moves.size() == EMPTY)
+            return Float.POSITIVE_INFINITY;
+
+        for(int i=0; i<moves.size(); i++){
+
+            state.add(moves.get(i));
+            float tmp = maxVal(w, state,depth+1);
+            state.remove(state.lastIndexOf(moves.get(i)));
+
+            if(tmp < min)
+                min = tmp;
+        }
+        return min;
+    }
+
+    private float maxVal(World w, ArrayList<String> state,int depth){
+        if(depth > this.depth){
+            String [][] b = w.getBoardAfterMove(state);
+            return evaluateWorld(w, b);
+        }
+
+        float max = Float.NEGATIVE_INFINITY;
+
+        ArrayList<String> moves = w.getAvailableMovesAfterMove(state,myColor);
+        if(moves.size() == EMPTY)
+            return Float.NEGATIVE_INFINITY;
+
+        for(int i=0; i<moves.size(); i++){
+            state.add(moves.get(i));
+            float tmp = minVal(w, state, depth+1);
+            state.remove(state.lastIndexOf(moves.get(i)));
+
+            if(tmp > max)
+                max = tmp;
+        }
+        return max;
     }
 
     private float minValue(World w, ArrayList<String> state, float alpha, float beta, int depth){

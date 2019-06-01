@@ -5,6 +5,10 @@ import java.util.Random;
 public class World {
 	private static final int WHITE = 0;
 	private static final int BLACK = 1;
+	private static final int MINIMAX = 111;
+	private static final int MINIMAX_ALPHA_BETA = 222;
+	private static final int MINIMAX_PV = 333;
+	private static final int MINIMAX_PV_WITH_NULL_WINDOW = 444;
 	private String[][] board = null;
 	private int rows = 7;
 	private int columns = 5;
@@ -91,10 +95,8 @@ public class World {
 		if(firstMove) // open move, unnecessary minimax algorithm decision
 			return "5141";
 
-		//Minimax minimax = new Minimax(Client.MINIMAX_DEPTH,this.myColor);
-		//ai_choice = minimax.decide(this);
-		MinimaxAlphaBeta minimaxAB = new MinimaxAlphaBeta(Client.MINIMAX_DEPTH,this.myColor);
-		ai_choice = minimaxAB.decide(this);
+		AgentSearch agent = new AgentSearch(Client.MINIMAX_DEPTH,this.myColor,MINIMAX_ALPHA_BETA);
+		ai_choice = agent.decide(this);
 
 		// keeping track of the branch factor
 		nTurns++;
