@@ -5,6 +5,7 @@ import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.Random;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class Client{
 	private static final int WHITE = 0;
@@ -17,19 +18,19 @@ public class Client{
 	private DatagramPacket sendPacket = null;
 	private DatagramPacket receivePacket = null;
 	private InetAddress host = null;
-	
+	private int delay;
 	private String myName = "client";
 	private String receivedMsg = "";
 	private int myColor = 0;
 	private World world;
 	private int scoreWhite = 0;
 	private int scoreBlack = 0;
-	private int delay = 10;				// never set it to 0
 	public static final int MINIMAX_DEPTH = 3;	// change minimax depth here
-	
-	public Client(){
+
+	public Client(int delay, int algorithmChoosed){
 		// initialization of the fields
 		try{
+			this.delay = delay;
 			clientSocket = new DatagramSocket();
 			
 			sendData = new byte[size];
@@ -51,10 +52,10 @@ public class Client{
 		myName += x;
 		
 		// create the world of the game
-		world = new World();
+		world = new World(algorithmChoosed);
 	}
 	
-	private void sendName(){
+	public void sendName(){
 		// add your name here, remove comment below
 		myName = "primary";
 		
@@ -71,7 +72,7 @@ public class Client{
 		}
 	}
 	
-	private void receiveMessages(){
+	public void receiveMessages(){
 		// keep on receiving messages and act according to their content
 		while(true){
 			try{
@@ -224,21 +225,6 @@ public class Client{
 	public int getScoreBlack()
 	{
 		return scoreBlack;
-	}
-
-	// testing
-	public static void main(String[] args){
-		Client client = new Client();
-		
-		// optionally adding delay to response
-		if(args.length == 1)
-			client.delay = Integer.parseInt(args[0]);
-		
-		// send the first message - my name
-		client.sendName();
-		
-		// start receiving messages;
-		client.receiveMessages();
 	}
 
 }

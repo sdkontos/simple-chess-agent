@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import java.util.Random;
+import java.util.concurrent.atomic.AtomicInteger;
 
 
 public class World {
@@ -18,10 +19,12 @@ public class World {
 	private int nTurns = 0;
 	private int nBranches = 0;
 	private int noPrize = 9;
+	private int algorithmChoosed;
 
 
 
-	public World(){
+	public World(int algorithmChoosed){
+		this.algorithmChoosed = algorithmChoosed;
 		board = new String[rows][columns];
 		
 		/* represent the board
@@ -554,7 +557,7 @@ public class World {
 	public ArrayList<String> getAvailableMovesAfterMove(ArrayList<String> state, int color){
 
 
-		World tempWorld = new World();
+		World tempWorld = new World(algorithmChoosed);
 		tempWorld.setMyColor(color);
 
 		for(int y=0; y<tempWorld.getColumns(); y++){
@@ -582,7 +585,7 @@ public class World {
 	}
 
 	public String[][] getBoardAfterMove(ArrayList<String> state){
-		World tempWorld = new World();
+		World tempWorld = new World(algorithmChoosed);
 
 		for(int y=0; y<tempWorld.getColumns(); y++){
 			for (int x=0; x<tempWorld.getRows(); x++){
