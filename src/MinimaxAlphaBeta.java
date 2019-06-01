@@ -45,7 +45,16 @@ public class MinimaxAlphaBeta {
         // get best move
         for(int i=0; i<availableMoves.size(); i++) {
             state.add(availableMoves.get(i));
+
+            // Alpha - Beta Minimax
             float tmpCost = minValue(world,state, Float.NEGATIVE_INFINITY, Float.POSITIVE_INFINITY,1);
+
+            // PV Search Minimax
+            //float tmpCost = pvSearch(world,state, Float.NEGATIVE_INFINITY, Float.POSITIVE_INFINITY,1,oppColor);
+
+            // PV Search with Null-Window Search Minimax
+            //float tmpCost = pvSearchNW(world,state, Float.NEGATIVE_INFINITY, Float.POSITIVE_INFINITY,1,oppColor);
+
             costs[i] = tmpCost;
             state.remove(state.lastIndexOf(availableMoves.get(i)));
         }
@@ -139,6 +148,7 @@ public class MinimaxAlphaBeta {
         for(int i=0; i<moves.size(); i++){
 
             state.add(moves.get(i));
+
             if(bSearchPV)
                 score = -pvSearch(w, state, -beta, -alpha, depth + 1, oppositeColor(color));
             else{
@@ -146,6 +156,7 @@ public class MinimaxAlphaBeta {
                 if(score > alpha) // fail-soft -> re-search
                     score = -pvSearch(w, state, -beta, -alpha, depth+1 , oppositeColor(color));
             }
+
             state.remove(state.lastIndexOf(moves.get(i)));
 
             if(score >= beta)
@@ -160,6 +171,69 @@ public class MinimaxAlphaBeta {
 
         return alpha; // fail hard -> alpha cut-off
 
+    }
+
+    private float pvSearchNW(World w, ArrayList<String> state, float alpha, float beta, int depth, int color){
+
+        float score;
+
+        if(depth > this.depth){
+            String [][] b = w.getBoardAfterMove(state);
+            return evaluateWorld(w, b);
+        }
+
+        boolean bSearchPV = colorToBool(color);
+
+        ArrayList<String> moves = w.getAvailableMovesAfterMove(state,color);
+
+        for(int i=0; i<moves.size(); i++){
+
+            state.add(moves.get(i));
+
+            if(bSearchPV)
+                score = -pvSearch(w, state, -beta, -alpha, depth + 1, oppositeColor(color));
+            else{
+                score = -zwSearch(w, state, -alpha, depth+1, oppositeColor(color));
+                if(score > alpha) // fail-soft -> re-search
+                    score = -pvSearch(w, state, -beta, -alpha, depth+1 , oppositeColor(color));
+            }
+
+            state.remove(state.lastIndexOf(moves.get(i)));
+
+            if(score >= beta)
+                return beta; // fail hard -> beta cut-off
+
+            if(score > alpha)
+                alpha = score; // like Minimax
+
+            bSearchPV = colorToBool(oppositeColor(color));
+
+        }
+
+        return alpha; // fail hard -> alpha cut-off
+
+    }
+
+    private float zwSearch(World w, ArrayList<String> state, float beta, int depth, int color){
+
+        float score;
+        float alpha = beta - 1;
+
+        if(depth > this.depth){
+            String [][] b = w.getBoardAfterMove(state);
+            return evaluateWorld(w, b);
+        }
+
+        ArrayList<String> moves = w.getAvailableMovesAfterMove(state,color);
+
+        for(int i=0; i<moves.size(); i++){
+            state.add(moves.get(i));
+            score = -zwSearch(w, state, 1-beta, depth+1, oppositeColor(color));
+            state.remove(state.lastIndexOf(moves.get(i)));
+            if(score >= beta)
+                return beta; // fail-hard beta-cutoff
+        }
+        return alpha; // fail-hard return alpha
     }
 
     private int evaluateWorld(World world, String[][] board){
@@ -300,4 +374,5 @@ public class MinimaxAlphaBeta {
         else
             return false;
     }
+
 }
