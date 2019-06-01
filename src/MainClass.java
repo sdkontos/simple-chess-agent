@@ -8,14 +8,14 @@ public class MainClass {
 
     // testing
     public static void main(String[] args){
-        Scanner in = new Scanner(System.in);
+        Scanner input = new Scanner(System.in);
         Client client;
-        int userChoice = MINIMAX_ALPHA_BETA;
+        int userChoice;
 
         System.out.println("Please choose algorithm:\nDefault - (0)\nMinimax - (1)\nMinimax with Alpha-Beta - (2)" +
                 "\nMinimax with Principal Variation (PV) Search - (3)" +
                 "\nMinimax with Principal Variation (PV) and Null-Window (NW) Search - (4)\nYour choice: ");
-        int userInput = in.nextInt();
+        int userInput = input.nextInt();
 
         userChoice = inputToCodec(userInput);
 
@@ -32,9 +32,9 @@ public class MainClass {
     }
 
     private static int inputToCodec(int input){
+
         if(input == 0 || input == 2)
             return MINIMAX_ALPHA_BETA;
-
         else if(input == 1)
             return MINIMAX;
         else if(input == 3)
