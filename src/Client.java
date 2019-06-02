@@ -50,7 +50,6 @@ public class Client{
 		Random ran = new Random();
 		int x = ran.nextInt(20);
 		myName += x;
-		
 		// create the world of the game
 		world = new World(algorithmChoosed);
 	}
