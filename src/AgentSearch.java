@@ -257,6 +257,7 @@ public class AgentSearch {
 
             if(bSearchPV)
                 score = pvSearch(w, state, -beta, -alpha, depth + 1, oppositeColor(color));
+
             else{
                 score = zwSearch(w, state, -alpha, depth+1, oppositeColor(color));
                 if(score > alpha && score < beta) // fail-soft -> re-search

@@ -57,7 +57,7 @@ public class Client{
 	
 	public void sendName(){
 		// add your name here, remove comment below
-		myName = "primary";
+		myName = "kasparov2795";
 		
 		try{
 			// turn my name into bytes

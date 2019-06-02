@@ -1,4 +1,3 @@
-import java.util.Scanner;
 
 public class MainClass {
     private static final int MINIMAX = 111;
@@ -8,21 +7,13 @@ public class MainClass {
 
     // testing
     public static void main(String[] args){
-        Scanner input = new Scanner(System.in);
         Client client;
-        int userChoice;
 
-        System.out.println("Please choose algorithm:\nDefault - (0)\nMinimax - (1)\nMinimax with Alpha-Beta - (2)" +
-                "\nMinimax with Principal Variation (PV) Search - (3)" +
-                "\nMinimax with Principal Variation (PV) and Null-Window (NW) Search - (4)\nYour choice: ");
-        int userInput = input.nextInt();
 
-        userChoice = inputToCodec(userInput);
-
-        if(args.length == 1)
-            client = new Client(Integer.parseInt(args[0]), userChoice);
+        if(args.length == 2)
+            client = new Client(Integer.parseInt(args[0]), inputToCodec(Integer.parseInt(args[1])));
         else
-            client = new Client(10, userChoice);
+            client = new Client(10, Integer.parseInt(args[0]));
 
         // send the first message - my name
         client.sendName();
