@@ -10,14 +10,10 @@ Especially, in src/AgentSearch.java you can find:
 * **PV Search (Principal Variation Search)**
 * **PV Search with Null Window**
 
-## Important!
-
-OpenMP implementation is OK.
-Pthreads has misses, especially coarse grain approach
-
 ## Authors
 
 * **Ilias Balampanis** - *balampanis.ilias@gmail.com*
 * **Kontos Stefanos** - *sdekontos@gmail.com*
 
+If you have questions, just send us an email!
 
