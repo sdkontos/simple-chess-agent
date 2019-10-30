@@ -1,4 +1,4 @@
-# Simple Chess Client
+# Simple Chess Agent
 
 This is an implemented project for course Artificial Intelligence in Technical University of Crete.
 
