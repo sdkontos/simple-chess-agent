@@ -1,7 +1,7 @@
 # Simple Chess Agent
 
-This is an implemented project for course Artificial Intelligence at Technical University of Crete. <br/>
-You can extract from this some implemented algorithms, usefull for chess programming.<br/>
+This is an implemented project for course Artificial Intelligence at Technical University of Crete. You can <br/>
+extract from this some implemented algorithms, usefull for chess programming.<br/>
 <br/>
 Especially, in ```src/AgentSearch.java``` you can find these algorithms:
 * **Minimax**
